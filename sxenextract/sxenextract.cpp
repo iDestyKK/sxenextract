@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -88,8 +89,39 @@ void extract_sxen_v01(ifstream &pak, string path) {
 	}
 }
 
+void extract_sxen_v02(ifstream &pak, string path) {
+	unsigned int length;
+	string song_name = "", song_author = "", song_genre = "", song_album = "", song_length = "", song_comment = "", song_year = "";
+
+	//Name
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_name += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_author += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_year += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_length += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_genre += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_album += pak.get(); }
+	length = pak.get();
+	for (int i = 0; i < (int)length; i++) { song_comment += pak.get(); }
+
+	cout << endl << setw(10) << left << "Song: " << song_name << endl 
+	             << setw(10) << left << "By: " << song_author << ", " << song_year << endl 
+				 << setw(10) << left << "Length: " << song_length << endl 
+				 << setw(10) << left << "Genre: " << song_genre << endl 
+				 << setw(10) << left << "Album: " << song_album << endl 
+				 << setw(10) << left << "Comment: " << song_comment << endl;
+
+	//The rest is literally the same as version 1. Carry on.
+	extract_sxen_v01(pak, path);
+}
+
 int main() {
-	string filename = "pak.song";
+	string filename = "pak.sxen";
 	string path = "";
 
 	clock_t start, end;
@@ -108,7 +140,8 @@ int main() {
 	cout << "SXEN PAK Version " << version_number << " detected" << endl;
 	switch (version_number) {
 		case 1: extract_sxen_v01(pak, path); break;
-		default: cout << "This extractor can not read this format (Perhaps too new?)" << endl; break;
+		case 2: extract_sxen_v02(pak, path); break;
+		default: cout << "This extractor can not read this format (Perhaps too new?)" << endl; getchar(); return -1; break;
 	}
 	pak.close();
 
